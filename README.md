@@ -8,12 +8,18 @@ the build on a finding, with no server) or `deployed` (report a deployment).
 What depwatch does and why: [`depwatch-docs/SYSTEM.md`](../depwatch-docs/SYSTEM.md). The CLI itself:
 [`depwatch-cli`](../depwatch-cli).
 
+**No depwatch CLI release has been published yet**, so this Action carries no checksums and cannot
+install anything: every run stops at the install step with "it carries none yet: no depwatch CLI
+release has been published". The first release adds `checksums/<version>.txt`; until then, build the
+CLI from source ([`depwatch-cli`](../depwatch-cli)).
+
 ## Use
 
 ```yaml
 - uses: actions/checkout@v4
 - uses: kimathinjoki/depwatch-action@<commit-sha>   # pin by commit SHA
   with:
+    version: <cli-version>                          # a release listed in checksums/
     command: gate
     args: --fail-on malicious,kev,severe
 ```
@@ -23,7 +29,7 @@ What depwatch does and why: [`depwatch-docs/SYSTEM.md`](../depwatch-docs/SYSTEM.
 | `command` | (required) | `scan`, `check`, `fix`, `gate` or `deployed` |
 | `args` | | more arguments, for example `--image app.tar` or `--sha ${{ github.sha }}` |
 | `working-directory` | `.` | the part's folder |
-| `version` | `0.1.0` | the CLI release; it must be listed in `checksums/` |
+| `version` | (required) | the CLI release; it must be listed in `checksums/`. There is no default and no "latest" |
 | `server`, `token` | | your depwatch server and the part's token (a secret), for `scan`, `check`, `fix`, `deployed` |
 | `github-token` | `${{ github.token }}` | the token `fix` opens pull requests with |
 
@@ -46,12 +52,15 @@ auto-merge.
 - The Action downloads one release asset for the runner's system and architecture and verifies its
   SHA-256 against `checksums/<version>.txt`, committed in this repository. A mismatch, or a version with
   no committed checksums, stops the step before anything runs. There is no "latest".
+- The checksums and the download address are fixed in the Action's own files. Nothing in the job's
+  environment changes them, so an earlier step writing to `$GITHUB_ENV` cannot swap the release or the
+  checksums it is checked against. The binary goes into a fresh folder under `$RUNNER_TEMP`.
 - Pin the Action itself by commit SHA, so neither the Action nor the CLI can change under you.
 
 ## Test
 
 ```sh
-bash tests/install_test.sh    # installer and runner against a local fake release
+bash tests/install_test.sh    # a copy of the Action, with its own checksums, against a local fake release
 shellcheck install.sh run.sh tests/install_test.sh
 ```
 

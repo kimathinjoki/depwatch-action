@@ -18,9 +18,8 @@ inputs:
     required: false
     default: "."
   version:
-    description: "The depwatch CLI release to use. The Action verifies it against the checksums it carries for that version."
-    required: false
-    default: "0.1.0"
+    description: "The depwatch CLI release to use, one this Action carries checksums for (checksums/). There is no default and no latest: no release is published yet."
+    required: true
   server:
     description: "The depwatch server (for scan, check, fix and deployed)."
     required: false

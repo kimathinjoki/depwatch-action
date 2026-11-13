@@ -13,11 +13,13 @@ jobs:
       # Pin the Action by commit SHA, never by a moving tag.
       - uses: kimathinjoki/depwatch-action@<commit-sha>
         with:
+          version: <cli-version>   # a release listed in the Action's checksums/
           command: scan
           server: https://depwatch.example.com
           token: ${{ secrets.DEPWATCH_TOKEN }}
       - uses: kimathinjoki/depwatch-action@<commit-sha>
         with:
+          version: <cli-version>   # a release listed in the Action's checksums/
           command: check
           server: https://depwatch.example.com
           token: ${{ secrets.DEPWATCH_TOKEN }}

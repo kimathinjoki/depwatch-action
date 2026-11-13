@@ -19,6 +19,7 @@ jobs:
           node-version-file: .nvmrc
       - uses: kimathinjoki/depwatch-action@<commit-sha>
         with:
+          version: <cli-version>   # a release listed in the Action's checksums/
           command: fix
           server: https://depwatch.example.com
           token: ${{ secrets.DEPWATCH_TOKEN }}

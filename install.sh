@@ -5,11 +5,34 @@
 # compromised ones.
 set -euo pipefail
 
-version="${DEPWATCH_VERSION:?set DEPWATCH_VERSION}"
+# Where releases are downloaded from and which checksums are trusted are fixed here, in the Action's
+# own files, never read from the job's environment: an earlier step writing to $GITHUB_ENV cannot swap
+# either. (The tests run a copy of the Action with its own checksums and release address.)
+release_base="https://github.com/kimathinjoki/depwatch-cli/releases/download"
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-checksums="${DEPWATCH_CHECKSUMS_DIR:-$here/checksums}/$version.txt"
-base="${DEPWATCH_RELEASE_BASE:-https://github.com/kimathinjoki/depwatch-cli/releases/download/v$version}"
-dest="${DEPWATCH_INSTALL_DIR:-${RUNNER_TEMP:-/tmp}/depwatch-$version}"
+
+# carried names the versions this Action has checksums for.
+carried() {
+  local list="" f
+  for f in "$here"/checksums/*.txt; do
+    [ -e "$f" ] || continue
+    f="${f##*/}"
+    list="$list ${f%.txt}"
+  done
+  if [ -n "$list" ]; then echo "it carries:$list"; else echo "it carries none yet: no depwatch CLI release has been published"; fi
+}
+
+version="${DEPWATCH_VERSION:-}"
+if [ -z "$version" ]; then
+  echo "depwatch: set the Action's version input to a depwatch CLI release; $(carried)" >&2
+  exit 1
+fi
+case "$version" in
+  *[!0-9A-Za-z.+-]*|.*|-*) echo "depwatch: '$version' is not a version" >&2; exit 1 ;;
+esac
+checksums="$here/checksums/$version.txt"
+base="$release_base/v$version"
+dest="$(mktemp -d "${RUNNER_TEMP:-/tmp}/depwatch-$version.XXXXXX")"
 
 case "${RUNNER_OS:-$(uname -s)}" in
   Linux) os=linux ;;
@@ -27,7 +50,7 @@ ext=tar.gz
 asset="depwatch_${version}_${os}_${arch}.$ext"
 
 if [ ! -f "$checksums" ]; then
-  echo "depwatch: this Action carries no checksums for version $version; use a version it lists in checksums/" >&2
+  echo "depwatch: this Action carries no checksums for version $version, so it will not install it; $(carried)" >&2
   exit 1
 fi
 want="$(awk -v a="$asset" '$2 == a { print $1 }' "$checksums")"

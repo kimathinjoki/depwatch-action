@@ -1,0 +1,23 @@
+# Send each push's inventory to depwatch, and the code check's draft verdicts.
+name: depwatch
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  depwatch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Pin the Action by commit SHA, never by a moving tag.
+      - uses: kimathinjoki/depwatch-action@<commit-sha>
+        with:
+          command: scan
+          server: https://depwatch.example.com
+          token: ${{ secrets.DEPWATCH_TOKEN }}
+      - uses: kimathinjoki/depwatch-action@<commit-sha>
+        with:
+          command: check
+          server: https://depwatch.example.com
+          token: ${{ secrets.DEPWATCH_TOKEN }}

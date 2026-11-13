@@ -1,0 +1,24 @@
+# Open (or update) one pull request per finding the workspace wants fixed by pull request.
+# The repository's own token opens them; a person reviews and merges. depwatch never merges.
+name: depwatch fix
+on:
+  schedule:
+    - cron: "17 5 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Set up the project's package manager first, as its own CI does.
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - uses: kimathinjoki/depwatch-action@<commit-sha>
+        with:
+          command: fix
+          server: https://depwatch.example.com
+          token: ${{ secrets.DEPWATCH_TOKEN }}

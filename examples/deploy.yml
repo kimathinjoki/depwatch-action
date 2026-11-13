@@ -1,0 +1,13 @@
+# In the deploy job, after the deployment succeeds: production becomes what was deployed.
+      - uses: kimathinjoki/depwatch-action@<commit-sha>
+        with:
+          command: scan
+          args: --image app.tar
+          server: https://depwatch.example.com
+          token: ${{ secrets.DEPWATCH_TOKEN }}
+      - uses: kimathinjoki/depwatch-action@<commit-sha>
+        with:
+          command: deployed
+          args: --sha ${{ github.sha }}
+          server: https://depwatch.example.com
+          token: ${{ secrets.DEPWATCH_TOKEN }}

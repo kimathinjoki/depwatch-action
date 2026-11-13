@@ -60,9 +60,14 @@ auto-merge.
 ## Test
 
 ```sh
-bash tests/install_test.sh    # a copy of the Action, with its own checksums, against a local fake release
-shellcheck install.sh run.sh tests/install_test.sh
+make check    # as CI: both below
+make test     # bash tests/install_test.sh: a copy of the Action, with its own checksums, against a local fake release
+make lint     # shellcheck install.sh run.sh tests/install_test.sh
 ```
+
+The Action has no settings file: it takes its inputs (`version`, `command`, `args`) in the workflow, and
+the CLI's own variables (`DEPWATCH_SERVER`, `DEPWATCH_TOKEN`, `GITHUB_TOKEN`) as workflow secrets and
+variables; `examples/` shows each.
 
 ## Licence
 

@@ -1,17 +1,17 @@
 # depwatch-action
 
 The GitHub Action for depwatch: it installs a pinned, checksummed release of the `depwatch` CLI on the
-runner and runs one command: `scan` (send the inventory to your depwatch server), `check` (the code
+runner and runs one command: `scan` (send the inventory to the depwatch service), `check` (the code
 check's draft verdicts), `fix` (open a pull request per finding set to be fixed that way), `gate` (fail
 the build on a finding, with no server) or `deployed` (report a deployment).
 
-What depwatch does and why: [`depwatch-docs/SYSTEM.md`](../depwatch-docs/SYSTEM.md). The CLI itself:
-[`depwatch-cli`](../depwatch-cli).
+The CLI itself, its commands and exit codes:
+[`depwatch-cli`](https://github.com/kimathinjoki/depwatch-cli).
 
 **No depwatch CLI release has been published yet**, so this Action carries no checksums and cannot
 install anything: every run stops at the install step with "it carries none yet: no depwatch CLI
 release has been published". The first release adds `checksums/<version>.txt`; until then, build the
-CLI from source ([`depwatch-cli`](../depwatch-cli)).
+CLI from source ([`depwatch-cli`](https://github.com/kimathinjoki/depwatch-cli)).
 
 ## Use
 
@@ -30,7 +30,7 @@ CLI from source ([`depwatch-cli`](../depwatch-cli)).
 | `args` | | more arguments, for example `--image app.tar` or `--sha ${{ github.sha }}` |
 | `working-directory` | `.` | the part's folder |
 | `version` | (required) | the CLI release; it must be listed in `checksums/`. There is no default and no "latest" |
-| `server`, `token` | | your depwatch server and the part's token (a secret), for `scan`, `check`, `fix`, `deployed` |
+| `server`, `token` | | the depwatch service's address and the part's token (a secret), for `scan`, `check`, `fix`, `deployed` |
 | `github-token` | `${{ github.token }}` | the token `fix` opens pull requests with |
 
 Output: `exit-code`, the command's exit code (the step also fails with it). Exit codes are the CLI's:

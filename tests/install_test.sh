@@ -14,71 +14,71 @@ fail() { echo "FAIL: $*" >&2; exit 1; }
 release="$work/release"; mkdir -p "$release/v9.9.9"
 for target in linux_amd64 darwin_arm64; do
   mkdir -p "$work/build/$target"
-  printf '#!/usr/bin/env bash\necho "depwatch 9.9.9 (%s)"\n' "$target" > "$work/build/$target/depwatch"
-  chmod +x "$work/build/$target/depwatch"
-  tar -czf "$release/v9.9.9/depwatch_9.9.9_$target.tar.gz" -C "$work/build/$target" depwatch
+  printf '#!/usr/bin/env bash\necho "watchdep 9.9.9 (%s)"\n' "$target" > "$work/build/$target/watchdep"
+  chmod +x "$work/build/$target/watchdep"
+  tar -czf "$release/v9.9.9/watchdep_9.9.9_$target.tar.gz" -C "$work/build/$target" watchdep
 done
 
 # The copy of the Action under test: its own checksums for 9.9.9, its release address the fake one.
 action="$work/action"; mkdir -p "$action/checksums"
 cp "$here/install.sh" "$here/run.sh" "$action/"
-(cd "$release/v9.9.9" && sha256sum depwatch_9.9.9_*.tar.gz) > "$action/checksums/9.9.9.txt"
+(cd "$release/v9.9.9" && sha256sum watchdep_9.9.9_*.tar.gz) > "$action/checksums/9.9.9.txt"
 sed -i.bak "s|^release_base=.*|release_base=\"file://$release\"|" "$action/install.sh" && rm -f "$action/install.sh.bak"
 grep -q "^release_base=\"file://$release\"" "$action/install.sh" || fail "the test could not point the copy at the fake release"
 
 export GITHUB_PATH="$work/path" RUNNER_TEMP="$work/tmp"
 mkdir -p "$RUNNER_TEMP"
 
-out="$(RUNNER_OS=Linux RUNNER_ARCH=X64 DEPWATCH_VERSION=9.9.9 "$action/install.sh")" || fail "a matching release did not install"
+out="$(RUNNER_OS=Linux RUNNER_ARCH=X64 WATCHDEP_VERSION=9.9.9 "$action/install.sh")" || fail "a matching release did not install"
 [[ "$out" == *"linux_amd64"* ]] || fail "wrong asset for Linux X64: $out"
-grep -q "$RUNNER_TEMP/depwatch-9.9.9" "$work/path" || fail "not added to GITHUB_PATH"
+grep -q "$RUNNER_TEMP/watchdep-9.9.9" "$work/path" || fail "not added to GITHUB_PATH"
 pass=$((pass+1))
 
-out="$(RUNNER_OS=macOS RUNNER_ARCH=ARM64 DEPWATCH_VERSION=9.9.9 "$action/install.sh")" || fail "macOS ARM64 did not install"
+out="$(RUNNER_OS=macOS RUNNER_ARCH=ARM64 WATCHDEP_VERSION=9.9.9 "$action/install.sh")" || fail "macOS ARM64 did not install"
 [[ "$out" == *"darwin_arm64"* ]] || fail "wrong asset for macOS ARM64: $out"
 pass=$((pass+1))
 
 # Checksums and a release address set in the job's environment (as an earlier step writing to
 # $GITHUB_ENV could) are ignored: the copy still installs only what its own checksums allow.
 evil="$work/evil"; mkdir -p "$evil/sums" "$evil/v9.9.9" "$evil/build"
-printf '#!/usr/bin/env bash\necho "planted"\n' > "$evil/build/depwatch"; chmod +x "$evil/build/depwatch"
-tar -czf "$evil/v9.9.9/depwatch_9.9.9_linux_amd64.tar.gz" -C "$evil/build" depwatch
-(cd "$evil/v9.9.9" && sha256sum depwatch_9.9.9_linux_amd64.tar.gz) > "$evil/sums/9.9.9.txt"
-out="$(RUNNER_OS=Linux RUNNER_ARCH=X64 DEPWATCH_VERSION=9.9.9 DEPWATCH_CHECKSUMS_DIR="$evil/sums" \
-  DEPWATCH_RELEASE_BASE="file://$evil/v9.9.9" DEPWATCH_INSTALL_DIR="$evil/dest" "$action/install.sh")" || fail "the environment changed the install"
+printf '#!/usr/bin/env bash\necho "planted"\n' > "$evil/build/watchdep"; chmod +x "$evil/build/watchdep"
+tar -czf "$evil/v9.9.9/watchdep_9.9.9_linux_amd64.tar.gz" -C "$evil/build" watchdep
+(cd "$evil/v9.9.9" && sha256sum watchdep_9.9.9_linux_amd64.tar.gz) > "$evil/sums/9.9.9.txt"
+out="$(RUNNER_OS=Linux RUNNER_ARCH=X64 WATCHDEP_VERSION=9.9.9 WATCHDEP_CHECKSUMS_DIR="$evil/sums" \
+  WATCHDEP_RELEASE_BASE="file://$evil/v9.9.9" WATCHDEP_INSTALL_DIR="$evil/dest" "$action/install.sh")" || fail "the environment changed the install"
 [[ "$out" == *"linux_amd64"* && "$out" != *planted* ]] || fail "the environment swapped the release: $out"
 [ ! -e "$evil/dest" ] || fail "the environment chose the install folder"
 pass=$((pass+1))
 
-printf 'tampered' >> "$release/v9.9.9/depwatch_9.9.9_linux_amd64.tar.gz"
-if RUNNER_OS=Linux RUNNER_ARCH=X64 DEPWATCH_VERSION=9.9.9 "$action/install.sh" 2>"$work/err"; then
+printf 'tampered' >> "$release/v9.9.9/watchdep_9.9.9_linux_amd64.tar.gz"
+if RUNNER_OS=Linux RUNNER_ARCH=X64 WATCHDEP_VERSION=9.9.9 "$action/install.sh" 2>"$work/err"; then
   fail "a tampered download was run"
 fi
 grep -q "does not match its checksum" "$work/err" || fail "no checksum message: $(cat "$work/err")"
 pass=$((pass+1))
 
-if RUNNER_OS=Linux RUNNER_ARCH=X64 DEPWATCH_VERSION=1.2.3 "$action/install.sh" 2>"$work/err"; then
+if RUNNER_OS=Linux RUNNER_ARCH=X64 WATCHDEP_VERSION=1.2.3 "$action/install.sh" 2>"$work/err"; then
   fail "a version with no committed checksums was installed"
 fi
 grep -q "carries no checksums for version 1.2.3" "$work/err" || fail "no message: $(cat "$work/err")"
 grep -q "it carries: 9.9.9" "$work/err" || fail "the message does not name the versions carried: $(cat "$work/err")"
 pass=$((pass+1))
 
-if RUNNER_OS=Linux RUNNER_ARCH=X64 DEPWATCH_VERSION='' "$action/install.sh" 2>"$work/err"; then
+if RUNNER_OS=Linux RUNNER_ARCH=X64 WATCHDEP_VERSION='' "$action/install.sh" 2>"$work/err"; then
   fail "no version installed something"
 fi
 grep -q "set the Action's version input" "$work/err" || fail "no message for a missing version: $(cat "$work/err")"
 pass=$((pass+1))
 
 # The real Action refuses a version it carries no checksums for, and names the ones it does.
-if RUNNER_OS=Linux RUNNER_ARCH=X64 DEPWATCH_VERSION=0.0.0 "$here/install.sh" 2>"$work/err"; then
+if RUNNER_OS=Linux RUNNER_ARCH=X64 WATCHDEP_VERSION=0.0.0 "$here/install.sh" 2>"$work/err"; then
   fail "the real Action installed a version it carries no checksums for"
 fi
 grep -q "carries no checksums for version 0.0.0" "$work/err" || fail "no message: $(cat "$work/err")"
 grep -q "it carries: 0.1.0" "$work/err" || fail "the real Action does not name 0.1.0: $(cat "$work/err")"
 pass=$((pass+1))
 
-if DEPWATCH_COMMAND=deploy "$here/run.sh" 2>"$work/err"; then fail "an unknown command ran"; fi
+if WATCHDEP_COMMAND=deploy "$here/run.sh" 2>"$work/err"; then fail "an unknown command ran"; fi
 grep -q "command must be" "$work/err" || fail "no message for an unknown command"
 pass=$((pass+1))
 

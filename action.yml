@@ -1,5 +1,5 @@
-name: depwatch
-description: Watch every layer of your dependencies for known vulnerabilities and compromised releases, with depwatch.
+name: watchdep
+description: Watch every layer of your dependencies for known vulnerabilities and compromised releases, with watchdep.
 author: kimathinjoki
 branding:
   icon: shield
@@ -18,43 +18,43 @@ inputs:
     required: false
     default: "."
   version:
-    description: "The depwatch CLI release to use, one this Action carries checksums for (checksums/). There is no default and no latest."
+    description: "The watchdep CLI release to use, one this Action carries checksums for (checksums/). There is no default and no latest."
     required: true
   server:
-    description: "The depwatch service's address (for scan, check, fix and deployed)."
+    description: "The watchdep service's address (for scan, check, fix and deployed)."
     required: false
     default: ""
   token:
-    description: "The part's depwatch token (keep it in a secret)."
+    description: "The part's watchdep token (keep it in a secret)."
     required: false
     default: ""
   github-token:
-    description: "The repository's own token, which depwatch fix uses to open pull requests (it never merges)."
+    description: "The repository's own token, which watchdep fix uses to open pull requests (it never merges)."
     required: false
     default: ${{ github.token }}
 
 outputs:
   exit-code:
-    description: "The depwatch command's exit code."
+    description: "The watchdep command's exit code."
     value: ${{ steps.run.outputs.exit-code }}
 
 runs:
   using: composite
   steps:
-    - name: Install depwatch ${{ inputs.version }}
+    - name: Install watchdep ${{ inputs.version }}
       shell: bash
       env:
-        DEPWATCH_VERSION: ${{ inputs.version }}
+        WATCHDEP_VERSION: ${{ inputs.version }}
       run: "\"$GITHUB_ACTION_PATH/install.sh\""
 
-    - name: depwatch ${{ inputs.command }}
+    - name: watchdep ${{ inputs.command }}
       id: run
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       env:
-        DEPWATCH_COMMAND: ${{ inputs.command }}
-        DEPWATCH_ARGS: ${{ inputs.args }}
-        DEPWATCH_SERVER: ${{ inputs.server }}
-        DEPWATCH_TOKEN: ${{ inputs.token }}
+        WATCHDEP_COMMAND: ${{ inputs.command }}
+        WATCHDEP_ARGS: ${{ inputs.args }}
+        WATCHDEP_SERVER: ${{ inputs.server }}
+        WATCHDEP_TOKEN: ${{ inputs.token }}
         GITHUB_TOKEN: ${{ inputs.github-token }}
       run: "\"$GITHUB_ACTION_PATH/run.sh\""

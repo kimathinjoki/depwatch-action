@@ -1,6 +1,6 @@
 # Stop a pull request's build on a malicious release, an exploited-now finding or anything severe.
 # No server needed: the gate checks OSV, CISA KEV and EPSS directly.
-name: depwatch gate
+name: watchdep gate
 on: [pull_request]
 permissions:
   contents: read
@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: kimathinjoki/depwatch-action@<commit-sha>
+      - uses: kimathinjoki/watchdep-action@<commit-sha>
         with:
           version: 0.1.0   # a release listed in the Action's checksums/
           command: gate

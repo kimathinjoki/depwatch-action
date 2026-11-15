@@ -1,21 +1,21 @@
-# depwatch-action
+# watchdep-action
 
-The GitHub Action for depwatch: it installs a pinned, checksummed release of the `depwatch` CLI on the
-runner and runs one command: `scan` (send the inventory to the depwatch service), `check` (the code
+The GitHub Action for watchdep: it installs a pinned, checksummed release of the `watchdep` CLI on the
+runner and runs one command: `scan` (send the inventory to the watchdep service), `check` (the code
 check's draft verdicts), `fix` (open a pull request per finding set to be fixed that way), `gate` (fail
 the build on a finding, with no server) or `deployed` (report a deployment).
 
 The CLI itself, its commands and exit codes:
-[`depwatch-cli`](https://github.com/kimathinjoki/depwatch-cli).
+[`watchdep-cli`](https://github.com/kimathinjoki/watchdep-cli).
 
-It carries checksums for depwatch CLI 0.1.0 (`checksums/`). Each new CLI release is added here in
+It carries checksums for watchdep CLI 0.1.0 (`checksums/`). Each new CLI release is added here in
 its own reviewed commit.
 
 ## Use
 
 ```yaml
 - uses: actions/checkout@v4
-- uses: kimathinjoki/depwatch-action@<commit-sha>   # pin by commit SHA
+- uses: kimathinjoki/watchdep-action@<commit-sha>   # pin by commit SHA
   with:
     version: 0.1.0                                  # a release listed in checksums/
     command: gate
@@ -28,7 +28,7 @@ its own reviewed commit.
 | `args` | | more arguments, for example `--image app.tar` or `--sha ${{ github.sha }}` |
 | `working-directory` | `.` | the part's folder |
 | `version` | (required) | the CLI release; it must be listed in `checksums/`. There is no default and no "latest" |
-| `server`, `token` | | the depwatch service's address and the part's token (a secret), for `scan`, `check`, `fix`, `deployed` |
+| `server`, `token` | | the watchdep service's address and the part's token (a secret), for `scan`, `check`, `fix`, `deployed` |
 | `github-token` | `${{ github.token }}` | the token `fix` opens pull requests with |
 
 Output: `exit-code`, the command's exit code (the step also fails with it). Exit codes are the CLI's:
@@ -42,7 +42,7 @@ fixes, scanning the built image and reporting deployments).
 `fix` needs `permissions: contents: write, pull-requests: write`, and the project's package manager set
 up before it (as your own CI does). It opens one pull request per finding per part, or updates the one
 already open, describing the advisory, the level, why it matters, the dependency path and the code
-check evidence. **A person approves and merges. depwatch never merges**, approves or turns on
+check evidence. **A person approves and merges. watchdep never merges**, approves or turns on
 auto-merge.
 
 ## Supply chain
@@ -64,7 +64,7 @@ make lint     # shellcheck install.sh run.sh tests/install_test.sh
 ```
 
 The Action has no settings file: it takes its inputs (`version`, `command`, `args`) in the workflow, and
-the CLI's own variables (`DEPWATCH_SERVER`, `DEPWATCH_TOKEN`, `GITHUB_TOKEN`) as workflow secrets and
+the CLI's own variables (`WATCHDEP_SERVER`, `WATCHDEP_TOKEN`, `GITHUB_TOKEN`) as workflow secrets and
 variables; `examples/` shows each.
 
 ## Licence

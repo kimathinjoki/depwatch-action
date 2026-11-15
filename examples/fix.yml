@@ -1,6 +1,6 @@
 # Open (or update) one pull request per finding the workspace wants fixed by pull request.
-# The repository's own token opens them; a person reviews and merges. depwatch never merges.
-name: depwatch fix
+# The repository's own token opens them; a person reviews and merges. watchdep never merges.
+name: watchdep fix
 on:
   schedule:
     - cron: "17 5 * * *"
@@ -17,9 +17,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-      - uses: kimathinjoki/depwatch-action@<commit-sha>
+      - uses: kimathinjoki/watchdep-action@<commit-sha>
         with:
           version: 0.1.0   # a release listed in the Action's checksums/
           command: fix
-          server: https://depwatch.example.com
-          token: ${{ secrets.DEPWATCH_TOKEN }}
+          server: https://watchdep.example.com
+          token: ${{ secrets.WATCHDEP_TOKEN }}

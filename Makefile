@@ -1,4 +1,4 @@
-# depwatch-action. `make check` is what CI runs.
+# watchdep-action. `make check` is what CI runs.
 
 .PHONY: help test lint check
 

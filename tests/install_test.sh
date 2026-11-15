@@ -64,7 +64,7 @@ grep -q "carries no checksums for version 1.2.3" "$work/err" || fail "no message
 grep -q "it carries: 9.9.9" "$work/err" || fail "the message does not name the versions carried: $(cat "$work/err")"
 pass=$((pass+1))
 
-if RUNNER_OS=Linux RUNNER_ARCH=X64 DEPWATCH_VERSION= "$action/install.sh" 2>"$work/err"; then
+if RUNNER_OS=Linux RUNNER_ARCH=X64 DEPWATCH_VERSION='' "$action/install.sh" 2>"$work/err"; then
   fail "no version installed something"
 fi
 grep -q "set the Action's version input" "$work/err" || fail "no message for a missing version: $(cat "$work/err")"

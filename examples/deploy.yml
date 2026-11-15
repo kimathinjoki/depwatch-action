@@ -1,14 +1,14 @@
 # In the deploy job, after the deployment succeeds: production becomes what was deployed.
       - uses: kimathinjoki/depwatch-action@<commit-sha>
         with:
-          version: <cli-version>   # a release listed in the Action's checksums/
+          version: 0.1.0   # a release listed in the Action's checksums/
           command: scan
           args: --image app.tar
           server: https://depwatch.example.com
           token: ${{ secrets.DEPWATCH_TOKEN }}
       - uses: kimathinjoki/depwatch-action@<commit-sha>
         with:
-          version: <cli-version>   # a release listed in the Action's checksums/
+          version: 0.1.0   # a release listed in the Action's checksums/
           command: deployed
           args: --sha ${{ github.sha }}
           server: https://depwatch.example.com

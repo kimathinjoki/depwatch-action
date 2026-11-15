@@ -70,15 +70,12 @@ fi
 grep -q "set the Action's version input" "$work/err" || fail "no message for a missing version: $(cat "$work/err")"
 pass=$((pass+1))
 
-# The real Action, which carries no checksums until the first release, says so plainly.
-if RUNNER_OS=Linux RUNNER_ARCH=X64 DEPWATCH_VERSION=0.1.0 "$here/install.sh" 2>"$work/err"; then
+# The real Action refuses a version it carries no checksums for, and names the ones it does.
+if RUNNER_OS=Linux RUNNER_ARCH=X64 DEPWATCH_VERSION=0.0.0 "$here/install.sh" 2>"$work/err"; then
   fail "the real Action installed a version it carries no checksums for"
 fi
-if ls "$here"/checksums/*.txt >/dev/null 2>&1; then
-  grep -q "carries no checksums for version 0.1.0" "$work/err" || fail "no message: $(cat "$work/err")"
-else
-  grep -q "no depwatch CLI release has been published" "$work/err" || fail "no plain message: $(cat "$work/err")"
-fi
+grep -q "carries no checksums for version 0.0.0" "$work/err" || fail "no message: $(cat "$work/err")"
+grep -q "it carries: 0.1.0" "$work/err" || fail "the real Action does not name 0.1.0: $(cat "$work/err")"
 pass=$((pass+1))
 
 if DEPWATCH_COMMAND=deploy "$here/run.sh" 2>"$work/err"; then fail "an unknown command ran"; fi

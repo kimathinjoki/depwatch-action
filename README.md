@@ -8,10 +8,8 @@ the build on a finding, with no server) or `deployed` (report a deployment).
 The CLI itself, its commands and exit codes:
 [`depwatch-cli`](https://github.com/kimathinjoki/depwatch-cli).
 
-**No depwatch CLI release has been published yet**, so this Action carries no checksums and cannot
-install anything: every run stops at the install step with "it carries none yet: no depwatch CLI
-release has been published". The first release adds `checksums/<version>.txt`; until then, build the
-CLI from source ([`depwatch-cli`](https://github.com/kimathinjoki/depwatch-cli)).
+It carries checksums for depwatch CLI 0.1.0 (`checksums/`). Each new CLI release is added here in
+its own reviewed commit.
 
 ## Use
 
@@ -19,7 +17,7 @@ CLI from source ([`depwatch-cli`](https://github.com/kimathinjoki/depwatch-cli))
 - uses: actions/checkout@v4
 - uses: kimathinjoki/depwatch-action@<commit-sha>   # pin by commit SHA
   with:
-    version: <cli-version>                          # a release listed in checksums/
+    version: 0.1.0                                  # a release listed in checksums/
     command: gate
     args: --fail-on malicious,kev,severe
 ```

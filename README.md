@@ -8,7 +8,7 @@ the build on a finding, with no server) or `deployed` (report a deployment).
 The CLI itself, its commands and exit codes:
 [`watchdep-cli`](https://github.com/kimathinjoki/watchdep-cli).
 
-It carries checksums for watchdep CLI 0.1.0 (`checksums/`). Each new CLI release is added here in
+It carries checksums for watchdep CLI 0.1.0, 0.2.0 and 0.3.0 (`checksums/`). Each new CLI release is added here in
 its own reviewed commit.
 
 ## Use
@@ -17,7 +17,7 @@ its own reviewed commit.
 - uses: actions/checkout@v4
 - uses: kimathinjoki/watchdep-action@<commit-sha>   # pin by commit SHA
   with:
-    version: 0.1.0                                  # a release listed in checksums/
+    version: 0.3.0                                  # a release listed in checksums/
     command: gate
     args: --fail-on malicious,kev,severe
 ```

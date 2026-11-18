@@ -11,6 +11,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: kimathinjoki/watchdep-action@<commit-sha>
         with:
-          version: 0.1.0   # a release listed in the Action's checksums/
+          version: 0.3.0   # a release listed in the Action's checksums/
           command: gate
           args: --fail-on malicious,kev,severe

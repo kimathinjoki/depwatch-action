@@ -8,7 +8,7 @@ the build on a finding, with no server) or `deployed` (report a deployment).
 The CLI itself, its commands and exit codes:
 [`watchdep-cli`](https://github.com/kimathinjoki/watchdep-cli).
 
-It carries checksums for watchdep CLI 0.1.0 to 0.4.0 (`checksums/`). Each new CLI release is added here in
+It carries checksums for watchdep CLI 0.1.0 to 0.5.0 (`checksums/`). Each new CLI release is added here in
 its own reviewed commit.
 
 ## Use
